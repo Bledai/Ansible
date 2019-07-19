@@ -1,4 +1,0 @@
-<VirtualHost *:{{ httpd_port }}>
-    ProxyPass / http://{{ service_address }}:{{ app_port }}/{{ app_name }}/
-    ProxyPassReverse / http://{{ service_address }}:{{ app_port }}/{{ app_name }}/
-</VirtualHost>
