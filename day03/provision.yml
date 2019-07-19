@@ -1,0 +1,47 @@
+- hosts: all
+  vars:
+    keys: "~/.ssh/*.pub"
+
+  roles:
+  - role: user
+    user_name: test
+    list_kyes: "{{ keys }}"
+    tags: user_create_vagrant
+
+  pre_tasks:
+    - setup:
+
+- hosts: appserver
+  roles:
+  - role: tomcat
+
+
+
+  tasks:
+  - name: Add war
+    become: yes
+    copy:
+      src: "{{ app_name + '.war' }}"
+      dest: "{{ catalina_home + '/webapps/' }}"
+      group: "{{ group_name }}"
+      owner: "{{ user_name }}"
+
+  post_tasks:
+  - name: Check custop app
+    shell: 'curl -sL -w "%{http_code}" localhost:8080/{{ app_name }}/ -o /dev/null | grep 200'
+    args:
+      warn: false
+
+- hosts: webserver
+  roles:
+  - role: httpd
+
+  - role: tomcat
+    configure_proxy: yes
+    tomcat_address: "{{ hostvars[groups['appserver'][0]].ansible_eth1.ipv4.address  }}"
+    tags: tomcat
+
+
+
+
+

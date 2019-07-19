@@ -1,0 +1,8 @@
+---
+# vars file for tomcat
+#url: https://www-eu.apache.org/dist/tomcat/tomcat-8/v8.5.41/bin/apache-tomcat-8.5.41.tar.gz
+tomcat_user_home: /opt/tomcat
+catalina_home: "{{ tomcat_user_home}}/apache-tomcat-{{ sub_v_tomcat }}"
+url: https://www-eu.apache.org/dist/tomcat/{{ v_tomcat  }}/v{{ sub_v_tomcat }}/bin/apache-tomcat-{{ sub_v_tomcat}}.tar.gz
+user_name: tomcat
+group_name: tomcat

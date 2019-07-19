@@ -1,0 +1,17 @@
+[webserver]
+192.168.198.31
+
+[appserver]
+192.168.198.32
+
+[all:vars]
+ansible_user=vagrant
+app_name=hello-world
+user_name=devops
+user_priv="{{ user_name }}  ALL=(ALL) NOPASSWD: ALL"
+
+
+[webserver:vars]
+service_name=tomcat
+app_port=8080
+

@@ -1,0 +1,14 @@
+---
+# tasks file for httpd_app
+- name: 'Configure proxy'
+  become: yes
+  template:
+    src: proxy.conf.j2
+    dest: /etc/httpd/conf.d/{{ service_name }}_proxy.conf
+    backup: yes
+  notify:
+    - "restart httpd"
+    - "save httpd_app details"
+
+
+

@@ -1,0 +1,34 @@
+- block:
+    - name: determine if tomcat is already installed
+      command: "{{ catalina_home }}/bin/version.sh"
+
+      register: tomcat_task_installed
+      changed_when: tomcat_task_installed.rc != 0
+      failed_when: no
+    # oracle_java_installed.rc == 0 : installed
+    # oracle_java_installed.rc == 1 : not installed
+    - debug: var=tomcat_task_installed
+
+    - name: set fact tomcat_installed
+      set_fact:
+        tomcat_installed={{ not tomcat_task_installed.changed }}
+
+  when: not configure_proxy | bool
+  become: yes
+  become_user: tomcat
+
+- block:
+    - name: determine if tomcat proxy is already installed
+      debug: var=ansible_local
+
+    - debug: var=tomcat_proxy_installed
+
+    - name: set fact tomcat_installed
+      set_fact:
+        proxy_installed={{ not tomcat_proxy_installed.changed }}
+  when: configure_proxy | bool
+
+
+
+
+

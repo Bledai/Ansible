@@ -1,0 +1,39 @@
+---
+# tasks file for user
+- name: Ensure group group exists
+  become: yes
+  group:
+    name: "{{ group_name }}"
+    gid: "{{ group_guid }}"
+    state: present
+
+- name: "Create user "
+  become: yes
+  user:
+    name: "{{ user_name }}"
+    group: "{{ group_name }}"
+    groups: "{{ item }}"
+    uid: "{{ users_uid[user_name] }}"
+    home: "{{ user_home }}"
+    create_home: "{{ create_home | bool }}"
+  notify:
+    - save user details
+  loop:
+    - "{{ groups_list }}"
+
+
+- debug: var=ansible_date_time.iso8601
+- name: "Add authorizations key"
+  become: yes
+  authorized_key:
+    user: "{{ user_name }}"
+    key: "{{ item }}"
+  with_fileglob: "{{ list_keys }}"
+
+- name: Add sudopiers user
+  become: yes
+  template:
+    src: "user.j2"
+    dest: "{{ '/etc/sudoers.d/' + user_name }}"
+    backup: yes 
+    validate: /usr/sbin/visudo -cf %s

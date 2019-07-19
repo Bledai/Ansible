@@ -1,0 +1,13 @@
+- hosts: webserver
+
+  tasks:
+
+    - name: Install python lib
+      pip:
+        name: psutil
+      become: yes
+    - name: Test my custom module
+      state:
+        process_name: httpd
+        port: 80
+      become: yes

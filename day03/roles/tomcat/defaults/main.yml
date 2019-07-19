@@ -1,0 +1,15 @@
+---
+# defaults file for tomcat
+v_tomcat: "tomcat-8"
+sub_v_tomcat: "8.5.41"
+
+configure_proxy: no
+
+tomcat_address: localhost
+
+app_name: ""
+app_port: "8080"
+
+httpd_port: "80"
+
+

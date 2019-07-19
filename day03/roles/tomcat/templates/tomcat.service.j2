@@ -1,0 +1,19 @@
+# Systemd unit file for tomcat
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=syslog.target network.target
+
+[Service]
+Type=forking
+
+
+ExecStart={{ catalina_home }}/bin/startup.sh
+ExecStop=/bin/kill -15 $MAINPID
+
+User=tomcat
+Group=tomcat
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

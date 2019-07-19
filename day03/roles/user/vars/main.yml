@@ -1,0 +1,7 @@
+---
+# vars file for user
+users_uid:
+  devops: 1001
+  test: 1002
+  tomcat: 1003
+user_home: "{{ '/home/' + user_name }}"

@@ -1,0 +1,8 @@
+---
+# vars file for httpd_app
+tomcat:
+  app_name: "/"
+  app_port: "8080"
+  app_address: localhost
+  httpd_port: "80"
+

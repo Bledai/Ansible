@@ -1,0 +1,8 @@
+---
+# tasks file for common
+- name: Ansible Facts Dir
+  file:
+    path: /etc/ansible/facts.d
+    state: directory 
+    recurse: yes
+  become: yes

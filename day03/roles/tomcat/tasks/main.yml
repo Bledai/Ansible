@@ -1,0 +1,51 @@
+---
+# tasks file for tomcat
+
+- name: check host environment
+  include: check_environment.yml
+- debug: var=tomcat_installed
+
+- block:
+    - name: Unarchive a file that needs to be downloaded apache-tomcat-8
+      unarchive:
+        src: "{{ url }}"
+        dest: "{{ tomcat_user_home }}"
+        group: tomcat
+        owner: tomcat
+        remote_src: yes
+
+    - name: Add tomcat.service
+      template:
+        src: tomcat.service.j2
+        dest: /etc/systemd/system/tomcat.service
+        backup: yes
+      notify:
+        - save tomcat details
+
+    - name: Start tomcat
+      service:
+        name: tomcat
+        enabled: yes
+        state: started
+
+    - name: get tomcats facts
+      shell: >
+        {{ catalina_home }}/bin/version.sh 2>&1 | sed 's/$/",/;s/^/"/;s/:\s+/":"/'
+      register: tomcat_facts
+  when: not configure_proxy | bool and not tomcat_installed
+  become: yes
+
+- block:
+    - debug: msg="configure"
+    - name: 'Configure proxy'
+
+      template:
+        src: proxy.conf.j2
+        dest: /etc/httpd/conf.d/{{ service_name }}_proxy.conf
+        backup: yes
+      notify:
+        - "restart httpd"
+        - "save proxy details"
+
+  when: configure_proxy | bool
+  become: yes

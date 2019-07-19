@@ -1,0 +1,10 @@
+---
+# defaults file for httpd_app
+
+service_name: ""
+service_address: localhost
+
+app_name: ""
+app_port: "80"
+
+httpd_port: "80"

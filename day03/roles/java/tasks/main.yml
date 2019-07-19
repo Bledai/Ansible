@@ -1,0 +1,68 @@
+---
+# tasks file for java
+
+- name: check host environment
+  include: check_environment.yml
+
+
+- block:
+  - name: mkdir for Java
+    file:
+      path: "{{ java_home }}"
+      state: directory
+      owner: root
+      group: root
+      mode: "u=rwx,go=rx"
+
+
+  - name: copy package from local
+    copy:
+      src: "{{ java_local_source }}/{{ java_package }}.tar.gz"
+      dest: "{{ java_home }}/{{ java_package }}.tar.gz"
+
+  - name: install JDK
+    unarchive:
+      src: "{{ java_home }}/{{ java_package }}.tar.gz"
+      dest: "{{ java_install_dir }}"
+      owner: root
+      group: root
+      mode: "go-w"
+      copy: no
+
+  - name: Configure Java alternatives
+    alternatives: name={{ item.name }} link={{ item.link }} path={{ item.path }}
+    with_items:
+      - { name: jar, link: /usr/bin/jar, path: "{{ java_home }}/bin/jar" }
+      - { name: java, link: /usr/bin/java, path: "{{ java_home }}/bin/java" }
+      - { name: javac, link: /usr/bin/javac, path: "{{ java_home }}/bin/javac" }
+
+  - name: check host environment
+    include: check_environment.yml
+
+  - name: check version java
+    fail: msg="version errors"
+    when: oracle_java_task_version.stdout != java_version
+
+  become: yes
+  when: not oracle_java_installed
+
+  rescue:
+    - debug: var=java_version
+    - debug: msg="java_version is null"
+      when: java_version == ''
+
+    - debug: msg="check java_version or java_package; java_local_source {{ java_local_source }}"
+
+- block:
+  - name: make sure /etc/profile.d exists
+    file: path=/etc/profile.d  state=directory
+
+  - name: export JAVA_HOME
+    template:
+      src:  ../templates/java_home.sh.j2
+      dest: /etc/profile.d/java_home.sh
+      owner: tomcat
+      mode: "a+x"
+
+  when: java_set_javahome
+  become: yes

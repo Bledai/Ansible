@@ -1,0 +1,30 @@
+---
+# handlers file for tomcat
+- block:
+    - name: save tomcat details
+      copy:
+        content: >
+          {
+            "{{ tomcat_facts.stdout[1:-3] }}",
+            "installed": "{{ ansible_date_time.iso8601 }}"
+          }
+        dest: /etc/ansible/facts.d/tomcat.fact
+      become: yes
+  when: not configure_proxy | bool
+- block:
+    - name: restart httpd
+      become: yes
+      service:
+        name: httpd
+        state: restarted
+
+    - name: save proxy details
+      copy:
+        content: >
+          {
+            "ProxyPass /" : "http://{{ tomcat_address }}:{{ app_port }}/{{ app_name }}/",
+            "deployed": "{{ ansible_date_time.iso8601 }}"
+          }
+        dest: "/etc/ansible/facts.d/tomcat_{{ app_name }}.fact"
+      become: yes
+  when: configure_proxy | bool
